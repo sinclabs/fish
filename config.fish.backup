@@ -1,0 +1,18 @@
+if status is-interactive
+    # Commands to run in interactive sessions can go here
+end
+
+set -x PATH $PATH "$HOME/.volta/bin"
+set -x PATH $PATH "/usr/local/bin"
+set -x PATH $PATH "/opt/homebrew/bin"
+
+set --global NPM_TOKEN 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
+
+set --global hydro_symbol_prompt 🔥
+set --global hydro_color_pwd $fish_color_param 
+
+zoxide init fish | source
+alias cat=bat
+alias ll="exa -lh"
+alias grep=rg
+alias icat="kitty +kitten icat"
