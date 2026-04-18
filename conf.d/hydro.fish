@@ -32,7 +32,17 @@ function _hydro_pwd --on-variable PWD --on-variable hydro_ignored_git_paths --on
 end
 
 function _hydro_postexec --on-event fish_postexec
-    test "$CMD_DURATION" -lt 1000 && set _hydro_cmd_duration && return
+    set --local last_status $pipestatus
+    set --global _hydro_status "$_hydro_newline$_hydro_color_prompt$hydro_symbol_prompt"
+
+    for code in $last_status
+        if test $code -ne 0
+            set --global _hydro_status "$_hydro_color_error| "(echo $last_status)" $_hydro_newline$_hydro_color_prompt$_hydro_color_error$hydro_symbol_prompt"
+            break
+        end
+    end
+
+    test "$CMD_DURATION" -lt $hydro_cmd_duration_threshold && set _hydro_cmd_duration && return
 
     set --local secs (math --scale=1 $CMD_DURATION/1000 % 60)
     set --local mins (math --scale=0 $CMD_DURATION/60000 % 60)
@@ -48,16 +58,8 @@ function _hydro_postexec --on-event fish_postexec
 end
 
 function _hydro_prompt --on-event fish_prompt
-    set --local last_status $pipestatus
+    set --query _hydro_status || set --global _hydro_status "$_hydro_newline$_hydro_color_prompt$hydro_symbol_prompt"
     set --query _hydro_pwd || _hydro_pwd
-    set --global _hydro_prompt "$_hydro_newline$_hydro_color_prompt$hydro_symbol_prompt"
-
-    for code in $last_status
-        if test $code -ne 0
-            set _hydro_prompt "$_hydro_newline$_hydro_color_error"[(echo $last_status)]
-            break
-        end
-    end
 
     command kill $_hydro_last_pid 2>/dev/null
 
@@ -65,7 +67,7 @@ function _hydro_prompt --on-event fish_prompt
 
     fish --private --command "
         set branch (
-            command git symbolic-ref --short HEAD 2>/dev/null ||
+            command git branch --show-current 2>/dev/null ||
             command git describe --tags --exact-match HEAD 2>/dev/null ||
             command git rev-parse --short HEAD 2>/dev/null |
                 string replace --regex -- '(.+)' '@\$1'
@@ -73,9 +75,9 @@ function _hydro_prompt --on-event fish_prompt
 
         test -z \"\$$_hydro_git\" && set --universal $_hydro_git \"\$branch \"
 
-        ! command git diff-index --quiet HEAD 2>/dev/null ||
-            count (command git ls-files --others --exclude-standard) >/dev/null &&
-            set info \"$hydro_symbol_git_dirty\"
+        command git diff-index --quiet HEAD 2>/dev/null
+        test \$status -eq 1 ||
+            count (command git ls-files --others --exclude-standard (command git rev-parse --show-toplevel)) >/dev/null && set info \"$hydro_symbol_git_dirty\"
 
         for fetch in $hydro_fetch false
             command git rev-list --count --left-right @{upstream}...@ 2>/dev/null |
@@ -97,7 +99,7 @@ function _hydro_prompt --on-event fish_prompt
         end
     " &
 
-    set --global _hydro_last_pid (jobs --last --pid)
+    set --global _hydro_last_pid $last_pid
 end
 
 function _hydro_fish_exit --on-event fish_exit
@@ -113,7 +115,7 @@ end
 
 set --global hydro_color_normal (set_color normal)
 
-for color in hydro_color_{pwd,git,error,prompt,duration}
+for color in hydro_color_{pwd,git,error,prompt,duration,start}
     function $color --on-variable $color --inherit-variable color
         set --query $color && set --global _$color (set_color $$color)
     end && $color
@@ -133,3 +135,4 @@ set --query hydro_symbol_git_dirty || set --global hydro_symbol_git_dirty •
 set --query hydro_symbol_git_ahead || set --global hydro_symbol_git_ahead ↑
 set --query hydro_symbol_git_behind || set --global hydro_symbol_git_behind ↓
 set --query hydro_multiline || set --global hydro_multiline false
+set --query hydro_cmd_duration_threshold || set --global hydro_cmd_duration_threshold 1000

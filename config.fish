@@ -1,164 +1,86 @@
+# conf.d/ is auto-sourced before this file. See:
+#   conf.d/aliases.fish          user aliases
+#   conf.d/bindings.fish         keybindings
+#   conf.d/postexec_handlers.fish  fish_postexec event handlers
+
+# -----------------------------------------------------------------------------
+# Profile & secrets
+# -----------------------------------------------------------------------------
+test -e ~/.config/fish/secrets.fish; and source ~/.config/fish/secrets.fish
+test -e ~/.profile; and source ~/.profile
+test -e ~/.fish_abbrs.fish; and source ~/.fish_abbrs.fish
+
+# -----------------------------------------------------------------------------
+# Prompt (hydro)
+# -----------------------------------------------------------------------------
 set --global hydro_symbol_prompt 🔥
 set --global hydro_multiline true
-set --global hydro_color_pwd $fish_color_param 
+set --global hydro_color_pwd $fish_color_param
 
+# -----------------------------------------------------------------------------
+# Editor
+# -----------------------------------------------------------------------------
 set -gx EDITOR nvim
 
-source ~/.config/fish/secrets.fish
-
-alias c=clear
-alias cat=bat
-alias ll="eza -lah -g --icons"
-alias ls="eza --icons"
-alias grep=rg
-alias icat="kitty +kitten icat"
-alias vim="nvim"
-alias v="nvim"
-alias lg=lazygit
-alias ld=lazydocker
-
-# zoxide init fish | source
-
-# Binds option-up
-bind \e\[1\;5A history-token-search-backward
-# Binds super-up (for emacs vterm integration, where there is no "option"
-bind \e\[1\;2A history-token-search-backward
-
-# option-down
-bind \e\[1\;5B history-token-search-forward
-# super-down
-bind \e\[1\;2B history-token-search-forward
-
-# Make C-t transpose characters :)
-bind \ct transpose-chars
-
-# Make C-s accept autocompletion and submit :))
-bind \cs accept-autosuggestion execute
-
-alias tmux="tmux -f \"$HOME/.config/tmux/tmux.conf\""
-
-# set -x PATH $PATH /Users/subbu.alagappan/.volta/bin
-set -x DENO_INSTALL /Users/subbu.alagappan/.deno
-set -x PATH $PATH "/usr/local/bin"
-set -x PATH $PATH "/opt/homebrew/bin"
-set -x PATH $PATH "$HOME/.cargo/bin"
-set -x PATH $PATH "/opt/homebrew/opt/coreutils/libexec/gnubin"
-set -x PATH $PATH "$HOME/.local/bin"
-set -x PATH $PATH "$DENO_INSTALL/bin" 
-set -x PATH $PATH "$HOME/go/bin" 
-set -x BUN_INSTALL "$HOME/.bun"
-set -x PATH $BUN_INSTALL/bin $PATH
-
-set -x DYLD_LIBRARY_PATH $DYLD_LIBRARY_PATH:/usr/local/lib
-
+# -----------------------------------------------------------------------------
+# Language / tool env
+# -----------------------------------------------------------------------------
 set -x JAVA_HOME /Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
 set -x ANDROID_HOME $HOME/Library/Android/sdk
-set -x PATH $PATH $ANDROID_HOME/emulator
-set -x PATH $PATH $ANDROID_HOME/platform-tools
+set -x DENO_INSTALL $HOME/.deno
+set -x BUN_INSTALL $HOME/.bun
+set -gx PNPM_HOME "$HOME/Library/pnpm"
 
-set -x DOCKER_HOST unix:///$HOME/.docker/run/docker.sock
-
-set -x DBT_ENV_SF_ACCOUNT eqt.west-europe.azure
-
-set fish_user_paths /opt/homebrew/opt/postgresql@15/bin /opt/homebrew/opt/fzf/bin
-
+# dbt
 set -x DBT_PROFILES_DIR ~/.dbt
+set -x DBT_ENV_SF_ACCOUNT eqt.west-europe.azure
 set -x DBT_SALESFORCE_SCHEMA salesforce
 set -x DBT_EBX_LAKE_SCHEMA ebx_public
 
-set -x PATH $PATH "/Users/subbu.alagappan/Library/Application Support/JetBrains/Toolbox/scripts"
+# Docker
+set -x DOCKER_HOST unix:///$HOME/.docker/run/docker.sock
 
-# set --global ZELLIJ_AUTO_ATTACH true
-# set --global ZELLIJ_AUTO_EXIT true
+# Dynamic linker
+set -x DYLD_LIBRARY_PATH $DYLD_LIBRARY_PATH:/usr/local/lib
 
-# set GOPROXY -gx https://proxy.golang.org,https://europe-west1-go.pkg.dev/eqt-cicd-prod/go-repository,direct
-# set GONOPROXY -gx github.com/GoogleCloudPlatform/artifact-registry-go-tools
-# set GONOSUMDB -gx eqtpartners.com/*
-# set GOPRIVATE -gx eqtpartners.com/*
-# GOPROXY=proxy.golang.org go run github.com/GoogleCloudPlatform/artifact-registry-go-tools/cmd/auth@v0.1.0 add-locations --locations=europe-west1
-# GOPROXY=proxy.golang.org go run github.com/GoogleCloudPlatform/artifact-registry-go-tools/cmd/auth@v0.1.0 refreshexport 
+# -----------------------------------------------------------------------------
+# PATH
+# -----------------------------------------------------------------------------
+# fish_add_path dedupes, skips missing dirs, and is idempotent.
+#   -g  session (global) scope — config.fish is the source of truth
+#   -P  write directly to $PATH instead of $fish_user_paths
+#   -m  move already-present paths to the declared position (enforce order)
+#   -a  append (fallback priority) instead of prepend
+# Multiple args per call: first arg = highest priority.
 
-# alias nv="~/.local/opt/nvim-0.10/bin/nvim"
-alias cloud-proxy-staging="~/scripts/cloud-proxy-staging/cloud-proxy-staging.sh"
-alias cloud-proxy-prod="~/scripts/cloud-proxy-prod/cloud-proxy-prod.sh"
-alias cloud-cluster-test="~/scripts/cloud-cluster-test.sh"
-alias cloud-cluster-prod="~/scripts/cloud-cluster-prod.sh"
-alias cloud-proxy-conveyor-stage="~/scripts/cloud-proxy-conveyor-staging/cloud-proxy-conveyor-staging.sh"
-alias cloud-proxy-conveyor-prod="~/scripts/cloud-proxy-conveyor-prod/cloud-proxy-conveyor-prod.sh"
+# Prepend (take precedence over system PATH)
+fish_add_path -gPm \
+    $HOME/.local/bin \
+    $HOME/.cargo/bin \
+    $BUN_INSTALL/bin \
+    $PNPM_HOME \
+    /opt/homebrew/opt/coreutils/libexec/gnubin \
+    /opt/homebrew/opt/postgresql@15/bin \
+    /opt/homebrew/opt/fzf/bin \
+    /Library/Frameworks/Python.framework/Versions/3.12/bin \
+    /opt/homebrew/bin \
+    /usr/local/bin
 
-source $HOME/.config/fish/docker-aliases.fish
+# Append (fallbacks — won't shadow tools above)
+fish_add_path -gPam \
+    $HOME/go/bin \
+    $DENO_INSTALL/bin \
+    $ANDROID_HOME/emulator \
+    $ANDROID_HOME/platform-tools \
+    "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
-string match -q "$TERM_PROGRAM" "vscode"
+# Google Cloud SDK (provides its own PATH snippet)
+if test -f "$HOME/google-cloud-sdk/path.fish.inc"
+    source "$HOME/google-cloud-sdk/path.fish.inc"
+end
+
+# -----------------------------------------------------------------------------
+# VS Code shell integration
+# -----------------------------------------------------------------------------
+string match -q "$TERM_PROGRAM" vscode
 and . (code --locate-shell-integration-path fish)
-
-test -e ~/.profile && source ~/.profile
-test -e ~/.fish_abbrs.fish && source ~/.fish_abbrs.fish
-
-source ~/.config/fish/functions/post-exec-newline.fish
-
-# if status is-interactive
-#   # Commands to run in interactive sessions can go here
-#   eval (zellij setup --generate-auto-start fish | string collect)
-# end
-
-function postexec-source-profile --on-event fish_postexec
-    set command_line (echo $argv | string collect | string trim)
-
-    if string match -qr "^$EDITOR " $command_line
-        set file (echo $command_line | coln 2 | string replace '~' $HOME)
-        for config_file in ~/.profile ~/.config/fish/config.fish
-            if test (realpath -- $file) = (realpath $config_file)
-                echo -n "Sourcing "(echo $file | unexpand-home-tilde)"... "
-                source $file
-                echo done.
-            end
-        end
-    end
-end
-
-# TODO rewrite this using event emitters
-function save-error --on-event fish_postexec
-    set exit_status $status
-    set cancel_status 130
-
-    if not contains $exit_status 0 $cancel_status && \
-      not startswith retry "$argv" && \
-      not startswith sudo-retry "$argv"
-        set -g failed_command "$argv"
-    end
-end
-
-function save-edited-file --on-event fish_postexec
-    set command_line (echo $argv | string collect | string trim)
-    if string match -qr "^($EDITOR|edit) " "$command_line"
-        set -g editor_command $argv
-    end
-end
-
-function try-help-man --on-event fish_postexec
-  if startswith man "$argv"
-    set command (echo $argv | cut -d ' ' -f 2)
-    $command --help
-  end
-end
-
-# Setting PATH for Python 3.12
-# The original version is saved in /Users/subbu.alagappan/.config/fish/config.fish.pysave
-set -x PATH "/Library/Frameworks/Python.framework/Versions/3.12/bin" "$PATH"
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/subbu.alagappan/google-cloud-sdk/path.fish.inc' ]; 
-  . '/Users/subbu.alagappan/google-cloud-sdk/path.fish.inc';
-  source /Users/subbu.alagappan/google-cloud-sdk/path.fish.inc
-end
-
-exit 0
-
-fish_add_path $HOME/.local/bin
-
-# pnpm
-set -gx PNPM_HOME "/Users/subbu.alagappan/Library/pnpm"
-if not string match -q -- $PNPM_HOME $PATH
-  set -gx PATH "$PNPM_HOME" $PATH
-end
-# pnpm end

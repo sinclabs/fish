@@ -1,1 +1,11 @@
 secrets.fish
+
+# Fish runtime state
+fish_variables
+fishd.tmp.*
+
+# Installer / editor backups
+*.backup
+*.pysave
+*.swp
+.DS_Store
