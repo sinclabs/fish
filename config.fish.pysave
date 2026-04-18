@@ -1,23 +1,62 @@
+set -x DENO_INSTALL /Users/subbu.alagappan/.deno
+set -x PATH $PATH "$HOME/.volta/bin"
+set -x PATH $PATH "/usr/local/bin"
+set -x PATH $PATH "/opt/homebrew/bin"
+set -x PATH $PATH "$HOME/.cargo/bin"
+set -x PATH $PATH "/opt/homebrew/opt/coreutils/libexec/gnubin"
+set -x PATH $PATH "$HOME/.local/bin"
+set -x PATH $PATH "$DENO_INSTALL/bin" 
+set -x PATH $PATH "$HOME/go/bin" 
+set -x BUN_INSTALL "$HOME/.bun"
+set -x PATH $BUN_INSTALL/bin $PATH
+
+set -x NPM_TOKEN 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
+
+set -gx JAVA_HOME /Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
+set -gx ANDROID_HOME $HOME/Library/Android/sdk
+set -x PATH $PATH:$ANDROID_HOME/emulator
+set -x PATH $PATH:$ANDROID_HOME/platform-tools
+
 set --global hydro_symbol_prompt 🔥
 set --global hydro_multiline true
 set --global hydro_color_pwd $fish_color_param 
 
+set -x DOCKER_HOST unix:///$HOME/.docker/run/docker.sock
+
+set -x DBT_ENV_SF_ACCOUNT eqt.west-europe.azure
+
 set -gx EDITOR nvim
 
-source ~/.config/fish/secrets.fish
+# set --global ZELLIJ_AUTO_ATTACH true
+# set --global ZELLIJ_AUTO_EXIT true
 
+# set GOPROXY -gx https://proxy.golang.org,https://europe-west1-go.pkg.dev/eqt-cicd-prod/go-repository,direct
+# set GONOPROXY -gx github.com/GoogleCloudPlatform/artifact-registry-go-tools
+# set GONOSUMDB -gx eqtpartners.com/*
+# set GOPRIVATE -gx eqtpartners.com/*
+# GOPROXY=proxy.golang.org go run github.com/GoogleCloudPlatform/artifact-registry-go-tools/cmd/auth@v0.1.0 add-locations --locations=europe-west1
+# GOPROXY=proxy.golang.org go run github.com/GoogleCloudPlatform/artifact-registry-go-tools/cmd/auth@v0.1.0 refreshexport 
+
+zoxide init fish | source
 alias c=clear
 alias cat=bat
-alias ll="eza -lah -g --icons"
-alias ls="eza --icons"
+alias ll="exa -lh"
 alias grep=rg
 alias icat="kitty +kitten icat"
 alias vim="nvim"
 alias v="nvim"
-alias lg=lazygit
-alias ld=lazydocker
+alias tmux="tmux -f \"$HOME/.config/tmux/tmux.conf\""
+alias cloud-proxy-staging="~/scripts/cloud-proxy-staging/cloud-proxy-staging.sh"
+alias cloud-proxy-prod="~/scripts/cloud-proxy-prod/cloud-proxy-prod.sh"
+alias cloud-cluster-test="~/scripts/cloud-cluster-test.sh"
+alias cloud-cluster-prod="~/scripts/cloud-cluster-prod.sh"
+alias cloud-proxy-conveyor-stage="~/scripts/cloud-proxy-conveyor-staging/cloud-proxy-conveyor-staging.sh"
+alias cloud-proxy-conveyor-prod="~/scripts/cloud-proxy-conveyor-prod/cloud-proxy-conveyor-prod.sh"
 
-# zoxide init fish | source
+source $HOME/.config/fish/docker-aliases.fish
+
+string match -q "$TERM_PROGRAM" "vscode"
+and . (code --locate-shell-integration-path fish)
 
 # Binds option-up
 bind \e\[1\;5A history-token-search-backward
@@ -34,62 +73,6 @@ bind \ct transpose-chars
 
 # Make C-s accept autocompletion and submit :))
 bind \cs accept-autosuggestion execute
-
-alias tmux="tmux -f \"$HOME/.config/tmux/tmux.conf\""
-
-# set -x PATH $PATH /Users/subbu.alagappan/.volta/bin
-set -x DENO_INSTALL /Users/subbu.alagappan/.deno
-set -x PATH $PATH "/usr/local/bin"
-set -x PATH $PATH "/opt/homebrew/bin"
-set -x PATH $PATH "$HOME/.cargo/bin"
-set -x PATH $PATH "/opt/homebrew/opt/coreutils/libexec/gnubin"
-set -x PATH $PATH "$HOME/.local/bin"
-set -x PATH $PATH "$DENO_INSTALL/bin" 
-set -x PATH $PATH "$HOME/go/bin" 
-set -x BUN_INSTALL "$HOME/.bun"
-set -x PATH $BUN_INSTALL/bin $PATH
-
-set -x DYLD_LIBRARY_PATH $DYLD_LIBRARY_PATH:/usr/local/lib
-
-set -x JAVA_HOME /Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
-set -x ANDROID_HOME $HOME/Library/Android/sdk
-set -x PATH $PATH $ANDROID_HOME/emulator
-set -x PATH $PATH $ANDROID_HOME/platform-tools
-
-set -x DOCKER_HOST unix:///$HOME/.docker/run/docker.sock
-
-set -x DBT_ENV_SF_ACCOUNT eqt.west-europe.azure
-
-set fish_user_paths /opt/homebrew/opt/postgresql@15/bin /opt/homebrew/opt/fzf/bin
-
-set -x DBT_PROFILES_DIR ~/.dbt
-set -x DBT_SALESFORCE_SCHEMA salesforce
-set -x DBT_EBX_LAKE_SCHEMA ebx_public
-
-set -x PATH $PATH "/Users/subbu.alagappan/Library/Application Support/JetBrains/Toolbox/scripts"
-
-# set --global ZELLIJ_AUTO_ATTACH true
-# set --global ZELLIJ_AUTO_EXIT true
-
-# set GOPROXY -gx https://proxy.golang.org,https://europe-west1-go.pkg.dev/eqt-cicd-prod/go-repository,direct
-# set GONOPROXY -gx github.com/GoogleCloudPlatform/artifact-registry-go-tools
-# set GONOSUMDB -gx eqtpartners.com/*
-# set GOPRIVATE -gx eqtpartners.com/*
-# GOPROXY=proxy.golang.org go run github.com/GoogleCloudPlatform/artifact-registry-go-tools/cmd/auth@v0.1.0 add-locations --locations=europe-west1
-# GOPROXY=proxy.golang.org go run github.com/GoogleCloudPlatform/artifact-registry-go-tools/cmd/auth@v0.1.0 refreshexport 
-
-# alias nv="~/.local/opt/nvim-0.10/bin/nvim"
-alias cloud-proxy-staging="~/scripts/cloud-proxy-staging/cloud-proxy-staging.sh"
-alias cloud-proxy-prod="~/scripts/cloud-proxy-prod/cloud-proxy-prod.sh"
-alias cloud-cluster-test="~/scripts/cloud-cluster-test.sh"
-alias cloud-cluster-prod="~/scripts/cloud-cluster-prod.sh"
-alias cloud-proxy-conveyor-stage="~/scripts/cloud-proxy-conveyor-staging/cloud-proxy-conveyor-staging.sh"
-alias cloud-proxy-conveyor-prod="~/scripts/cloud-proxy-conveyor-prod/cloud-proxy-conveyor-prod.sh"
-
-source $HOME/.config/fish/docker-aliases.fish
-
-string match -q "$TERM_PROGRAM" "vscode"
-and . (code --locate-shell-integration-path fish)
 
 test -e ~/.profile && source ~/.profile
 test -e ~/.fish_abbrs.fish && source ~/.fish_abbrs.fish
@@ -142,10 +125,6 @@ function try-help-man --on-event fish_postexec
   end
 end
 
-# Setting PATH for Python 3.12
-# The original version is saved in /Users/subbu.alagappan/.config/fish/config.fish.pysave
-set -x PATH "/Library/Frameworks/Python.framework/Versions/3.12/bin" "$PATH"
-
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/subbu.alagappan/google-cloud-sdk/path.fish.inc' ]; 
   . '/Users/subbu.alagappan/google-cloud-sdk/path.fish.inc';
@@ -154,11 +133,5 @@ end
 
 exit 0
 
-fish_add_path $HOME/.local/bin
-
-# pnpm
-set -gx PNPM_HOME "/Users/subbu.alagappan/Library/pnpm"
-if not string match -q -- $PNPM_HOME $PATH
-  set -gx PATH "$PNPM_HOME" $PATH
-end
-# pnpm end
+set -gx VOLTA_HOME "$HOME/.volta"
+set -gx PATH "$VOLTA_HOME/bin" $PATH
