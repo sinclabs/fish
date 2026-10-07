@@ -3,6 +3,7 @@ secrets.fish
 # Fish runtime state
 fish_variables
 fishd.tmp.*
+fish_variables?*
 
 # Installer / editor backups
 *.backup
