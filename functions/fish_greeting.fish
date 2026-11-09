@@ -3,7 +3,7 @@ function fish_greeting
   ___======____='(set_color FF7F00)'-'(set_color red)'-'(set_color FF7F00)'-='(set_color F00)')
 /T            \_'(set_color red)'--='(set_color FF7F00)'=='(set_color F00)')    '(set_color red)(whoami)'@'(hostname)'
 [ \ '(set_color FF7F00)'('(set_color red)'0'(set_color FF7F00)')   '(set_color F00)'\~    \_'(set_color red)'-='(set_color FF7F00)'='(set_color F00)')'(set_color yellow)'    Uptime: '(set_color white)(uptime | sed 's/.*up \([^,]*\), .*/\1/')(set_color red)'
- \      / )J'(set_color FF7F00)'~~    \\'(set_color red)'-='(set_color F00)')    IP Address: '(set_color white)(ipconfig getifaddr en0)(set_color red)'
+ \      / )J'(set_color FF7F00)'~~    \\'(set_color red)'-='(set_color F00)')    IP Address: '(set_color white)(if command -q ipconfig; ipconfig getifaddr en0; else; ip -4 route get 1.1.1.1 2>/dev/null | string match -rg 'src (\S+)'; end)(set_color red)'
   \\\\___/  )JJ'(set_color FF7F00)'~'(set_color red)'~~   '(set_color F00)'\)     '(set_color yellow)'Version: '(set_color white)(echo $FISH_VERSION)(set_color red)'
    \_____/JJJ'(set_color FF7F00)'~~'(set_color red)'~~    '(set_color F00)'\\
    '(set_color FF7F00)'/ '(set_color red)'\  '(set_color red)', \\'(set_color F00)'J'(set_color FF7F00)'~~~'(set_color red)'~~     '(set_color FF7F00)'\\
